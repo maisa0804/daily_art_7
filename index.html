@@ -1,13 +1,32 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + TS</title>
+    <link rel="stylesheet" href="/src/style.css" />
+    <title>Hand Landmark Detection</title>
   </head>
   <body>
-    <div id="app"></div>
+    <div class="header-container">
+      <h1>Hand Landmark Detection</h1>
+      <p class="description">
+        This app uses your camera to detect and display the landmarks of your
+        hands in real-time.
+      </p>
+      <p class="description">
+        Using the
+        <a href="https://mediapipe.dev">Hand Landmarker</a>
+        model from MediaPipe.
+      </p>
+    </div>
+    <div id="app">
+      <video id="video" autoplay playsinline></video>
+      <canvas id="canvas"></canvas>
+      <div class="controls">
+        <button id="startButton" class="button-17" role="button">Start</button>
+      </div>
+    </div>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
