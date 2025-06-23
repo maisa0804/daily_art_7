@@ -51,6 +51,17 @@ h1 {
   aspect-ratio: 16 / 9;
 }
 
+#three-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  /* Allows clicks to go through to other elements */
+  z-index: 5;
+}
+
 video,
 canvas {
   position: absolute;
@@ -60,8 +71,16 @@ canvas {
   height: 100%;
   border-radius: 8px;
   object-fit: cover;
+}
+
+canvas {
+  z-index: 10;
+  /* Make sure this is on top */
+}
+
+video {
   display: none;
-  /* Hide initially */
+  transform: scaleX(-1);
 }
 
 .controls {

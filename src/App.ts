@@ -4,6 +4,7 @@ import {
   DrawingUtils,
   type HandLandmarkerResult,
 } from "@mediapipe/tasks-vision";
+import { ThreeScene } from "./threeScene";
 
 /**
  * Main application class for hand landmark detection.
@@ -18,6 +19,7 @@ export class App {
   private headerContainer: HTMLDivElement;
   private handLandmarker?: HandLandmarker;
   private lastVideoTime = -1;
+  private threeScene: ThreeScene;
 
   /**
    * Initializes the App, getting references to DOM elements.
@@ -33,6 +35,10 @@ export class App {
     this.headerContainer = document.querySelector(
       ".header-container"
     ) as HTMLDivElement;
+    const threeContainer = document.getElementById(
+      "three-container"
+    ) as HTMLDivElement;
+    this.threeScene = new ThreeScene(threeContainer);
 
     this.startButton.addEventListener("click", () => this.start());
   }
@@ -88,22 +94,67 @@ export class App {
     this.canvasCtx.save();
     this.canvasCtx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-    if (result.landmarks) {
+    if (result.landmarks && result.landmarks.length > 0) {
       const drawingUtils = new DrawingUtils(this.canvasCtx);
       for (const landmarks of result.landmarks) {
         drawingUtils.drawConnectors(
           landmarks,
           HandLandmarker.HAND_CONNECTIONS,
           {
-            color: "#00FF00",
-            lineWidth: 5,
+            color: "#FFFFFF",
+            lineWidth: 1,
           }
         );
         drawingUtils.drawLandmarks(landmarks, {
-          color: "#FF0000",
-          lineWidth: 2,
+          color: "#00FFFF",
+          radius: 2,
         });
       }
+
+      // Process first hand
+      const landmarks1 = result.landmarks[0];
+      if (landmarks1) {
+        const isIndexFingerUp =
+          landmarks1[8].y < landmarks1[5].y &&
+          landmarks1[12].y > landmarks1[9].y &&
+          landmarks1[16].y > landmarks1[13].y &&
+          landmarks1[20].y > landmarks1[17].y;
+        if (isIndexFingerUp) {
+          this.threeScene.addPoint1(
+            landmarks1[8].x,
+            landmarks1[8].y,
+            landmarks1[8].z
+          );
+        } else {
+          this.threeScene.finalizeLine1();
+        }
+      }
+
+      // Process second hand
+      const landmarks2 = result.landmarks[1];
+      if (landmarks2) {
+        const isIndexFingerUp =
+          landmarks2[8].y < landmarks2[5].y &&
+          landmarks2[12].y > landmarks2[9].y &&
+          landmarks2[16].y > landmarks2[13].y &&
+          landmarks2[20].y > landmarks2[17].y;
+        if (isIndexFingerUp) {
+          this.threeScene.addPoint2(
+            landmarks2[8].x,
+            landmarks2[8].y,
+            landmarks2[8].z
+          );
+        } else {
+          this.threeScene.finalizeLine2();
+        }
+      } else {
+        // If second hand is not detected, finalize its line
+        this.threeScene.finalizeLine2();
+      }
+    } else {
+      // If no hands are detected, finalize both lines
+      this.threeScene.finalizeLine1();
+      this.threeScene.finalizeLine2();
     }
     this.canvasCtx.restore();
   }
@@ -132,7 +183,7 @@ export class App {
   public async start() {
     this.controls.style.display = "none";
     this.headerContainer.style.display = "none";
-    this.video.style.display = "block";
+    // this.video.style.display = "block"; // This line is removed to hide the video
     this.canvas.style.display = "block";
 
     try {
