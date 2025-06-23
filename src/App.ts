@@ -17,6 +17,7 @@ export class App {
   private startButton: HTMLButtonElement;
   private controls: HTMLDivElement;
   private headerContainer: HTMLDivElement;
+  private instructionsContainer: HTMLDivElement;
   private handLandmarker?: HandLandmarker;
   private lastVideoTime = -1;
   private threeScene: ThreeScene;
@@ -34,6 +35,9 @@ export class App {
     this.controls = document.querySelector(".controls") as HTMLDivElement;
     this.headerContainer = document.querySelector(
       ".header-container"
+    ) as HTMLDivElement;
+    this.instructionsContainer = document.querySelector(
+      ".instructions-container"
     ) as HTMLDivElement;
     const threeContainer = document.getElementById(
       "three-container"
@@ -183,8 +187,14 @@ export class App {
   public async start() {
     this.controls.style.display = "none";
     this.headerContainer.style.display = "none";
-    // this.video.style.display = "block"; // This line is removed to hide the video
     this.canvas.style.display = "block";
+
+    // Show instructions and then hide them after a delay
+    this.instructionsContainer.style.display = "block";
+    setTimeout(() => {
+      this.instructionsContainer.style.transition = "opacity 1s";
+      this.instructionsContainer.style.opacity = "0";
+    }, 4000); // Start fading after 4 seconds
 
     try {
       await this.initHandLandmarker();
@@ -194,6 +204,7 @@ export class App {
       console.error("Failed to initialize app:", error);
       this.controls.style.display = "flex";
       this.headerContainer.style.display = "block";
+      this.instructionsContainer.style.display = "none";
     }
   }
 }
